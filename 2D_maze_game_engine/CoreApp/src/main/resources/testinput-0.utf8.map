@@ -1,0 +1,39 @@
+size (10, 17)
+start (9, 3)
+goal (1, 5)
+  obstacle {
+  at (7,7), (5,5), (13,8), (9,2), (4,2), (8,5), (16,8), (9,5), (3,9), (1,9), (10,9), (9,0), (3,0), (2,7), (7,0), (8,1), (6,6), (8,0), (3,8), (5,0), (17,4), (9,5), (2,1), (3,10), (8,3), (4,1), (8,10)
+  requires "grey vial", "magic turquoise flask"
+}
+
+item "grey vial" {
+  at (8,9)
+  message "uwYHSPVdn"
+}
+
+item "magic turquoise flask" {
+  at (6,2)
+  message "=Jm"
+}
+
+plugin hMv.Mo.iBl
+
+item "bejeweled grey book" {
+  at (1,3)
+  message "PtdMSvgBzE"
+}
+
+script !{
+PwJ 8(@
+hYn:YX>\ G&z4Yr[v.S:YaO]%CVEYUM\\J+^1s-
+qvZIYS:qn2%gm_'`7JA];/VI;U\&'IA72gZ]yX$T
+BJD!+"fYFSAQzfGd[?1p%>-<ApqkSi_RCJ8n-JRW
+}
+
+script !{
+C/lWO[s
+`>*>8'vsFNc/S\@`J{Zk
+}
+
+plugin akcE.aiGl.SMbzH.IJB.uX
+

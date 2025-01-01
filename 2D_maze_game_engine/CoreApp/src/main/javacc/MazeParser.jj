@@ -1,0 +1,203 @@
+options {
+  STATIC = false;
+}
+
+PARSER_BEGIN(MazeParser)
+package edu.curtin.saed.assignment2;
+
+import java.util.*;
+
+public class MazeParser {
+    public static class MazeData {
+        public int rows, cols;
+        public int startRow, startCol;
+        public int goalRow, goalCol;
+        public List<Item> items = new ArrayList<Item>();
+        public List<Obstacle> obstacles = new ArrayList<Obstacle>();
+        public List<String> plugins = new ArrayList<String>();
+        public List<String> scripts = new ArrayList<String>();
+    }
+
+    public static class Item {
+        public String name;
+        public List<int[]> locations = new ArrayList<int[]>();
+        public String message;
+    }
+
+    public static class Obstacle {
+        public List<int[]> locations = new ArrayList<int[]>();
+        public List<String> requiredItems = new ArrayList<String>();
+    }
+}
+
+PARSER_END(MazeParser)
+
+SKIP : { " " | "\t" | "\n" | "\r" }
+
+TOKEN :
+{
+    < SIZE: "size" >
+  | < START: "start" >
+  | < GOAL: "goal" >
+  | < ITEM: "item" >
+  | < OBSTACLE: "obstacle" >
+  | < AT: "at" >
+  | < REQUIRES: "requires" >
+  | < MESSAGE: "message" >
+  | < PLUGIN: "plugin" >
+  | < SCRIPT: "script" >
+  | < LPAREN: "(" >
+  | < RPAREN: ")" >
+  | < LBRACE: "{" >
+  | < RBRACE: "}" >
+  | < COMMA: "," >
+  | < NUMBER: (["0"-"9"])+ >
+  | < STRING: "\"" (~["\""])* "\"" >
+  | < IDENTIFIER: ["a"-"z","A"-"Z","_"] (["a"-"z","A"-"Z","0"-"9","_","."])* >
+  | < SCRIPT_CONTENT: "!{" (~["}"])* "}" >
+}
+
+MazeData parse() :
+{
+    MazeData data = new MazeData();
+}
+{
+    size(data)
+    start(data)
+    goal(data)
+    (
+        item(data)
+      | obstacle(data)
+      | plugin(data)
+      | script(data)
+    )*
+    <EOF>
+    { return data; }
+}
+
+void size(MazeData data) :
+{
+    Token t1, t2;
+}
+{
+    <SIZE> <LPAREN> t1=<NUMBER> <COMMA> t2=<NUMBER> <RPAREN>
+    {
+        data.rows = Integer.parseInt(t1.image);
+        data.cols = Integer.parseInt(t2.image);
+    }
+}
+
+void start(MazeData data) :
+{
+    Token t1, t2;
+}
+{
+    <START> <LPAREN> t1=<NUMBER> <COMMA> t2=<NUMBER> <RPAREN>
+    {
+        data.startRow = Integer.parseInt(t1.image);
+        data.startCol = Integer.parseInt(t2.image);
+    }
+}
+
+void goal(MazeData data) :
+{
+    Token t1, t2;
+}
+{
+    <GOAL> <LPAREN> t1=<NUMBER> <COMMA> t2=<NUMBER> <RPAREN>
+    {
+        data.goalRow = Integer.parseInt(t1.image);
+        data.goalCol = Integer.parseInt(t2.image);
+    }
+}
+
+void item(MazeData data) :
+{
+    Item item = new Item();
+    Token t;
+}
+{
+    <ITEM> t=<STRING> <LBRACE>
+    {
+        item.name = t.image.substring(1, t.image.length() - 1);
+    }
+    <AT> locations(item.locations)
+    <MESSAGE> t=<STRING>
+    {
+        item.message = t.image.substring(1, t.image.length() - 1);
+    }
+    <RBRACE>
+    {
+        data.items.add(item);
+    }
+}
+
+void obstacle(MazeData data) :
+{
+    Obstacle obstacle = new Obstacle();
+}
+{
+    <OBSTACLE> <LBRACE>
+    <AT> locations(obstacle.locations)
+    <REQUIRES> requiredItems(obstacle.requiredItems)
+    <RBRACE>
+    {
+        data.obstacles.add(obstacle);
+    }
+}
+
+void locations(List<int[]> locations) :
+{
+    Token t1, t2;
+}
+{
+    <LPAREN> t1=<NUMBER> <COMMA> t2=<NUMBER> <RPAREN>
+    {
+        locations.add(new int[]{Integer.parseInt(t1.image), Integer.parseInt(t2.image)});
+    }
+    (
+        <COMMA> <LPAREN> t1=<NUMBER> <COMMA> t2=<NUMBER> <RPAREN>
+        {
+            locations.add(new int[]{Integer.parseInt(t1.image), Integer.parseInt(t2.image)});
+        }
+    )*
+}
+
+void requiredItems(List<String> items) :
+{
+    Token t;
+}
+{
+    t=<STRING>
+    {
+        items.add(t.image.substring(1, t.image.length() - 1));
+    }
+    (
+        <COMMA> t=<STRING>
+        {
+            items.add(t.image.substring(1, t.image.length() - 1));
+        }
+    )*
+}
+
+void plugin(MazeData data) :
+{
+    Token t;
+}
+{
+    <PLUGIN> t=<IDENTIFIER>
+    {
+        data.plugins.add(t.image);
+    }
+}
+
+void script(MazeData data) :
+{
+    Token t;
+}
+{
+    <SCRIPT> t=<SCRIPT_CONTENT>
+    {
+        data.scripts.add(t.image.substring(2, t.image.length() - 1));
+    }
+}

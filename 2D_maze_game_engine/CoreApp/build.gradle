@@ -1,0 +1,60 @@
+plugins {
+    id "java"
+    id "application"
+    id "pmd"
+    id "org.openjfx.javafxplugin" version "0.1.0"
+    id 'com.intershop.gradle.javacc' version '4.0.1'
+}
+
+repositories {
+    mavenCentral()
+}
+dependencies {
+    implementation 'net.java.dev.javacc:javacc:7.0.5'
+    implementation 'com.google.guava:guava:31.1-jre'
+    implementation 'org.python:jython-standalone:2.7.2'
+    implementation project(':Teleport_Plugin')
+    implementation project(':Penalty_Plugin')
+    implementation project(':Reveal_Plugin')
+    implementation project(':API')
+    runtimeOnly project(':Teleport_Plugin')
+    runtimeOnly project(':Reveal_Plugin')
+    runtimeOnly project(':Penalty_Plugin')
+}
+
+javacc {
+    configs {
+        createmyparser {
+            inputFile = file('src/main/javacc/MazeParser.jj')
+            packageName = 'edu.curtin.saed.assignment2'
+        }
+    }
+}
+application {
+    mainClass = "edu.curtin.saed.assignment2.App"
+}
+
+javafx {
+    version = '21'
+    modules = [ 'javafx.controls' ]
+}
+
+pmd {
+    consoleOutput = true
+    toolVersion = "7.3.0"
+    rulesMinimumPriority = 5
+    ruleSets = []
+    ruleSetFiles = files("saed-pmd-rules.xml")
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:all,-serial"
+}
+
+tasks.named("run") {
+    environment["PATH"] = (
+        layout.projectDirectory.dir("comms").dir("bin").toString() 
+        + File.pathSeparator
+        + environment["PATH"])
+}
+applicationDefaultJvmArgs = ["-Xmx1024m", "-Xms512m"]

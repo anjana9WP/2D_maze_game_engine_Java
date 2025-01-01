@@ -1,0 +1,23 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'edu.curtin.gameplugins.Penalty'
+version = 'unspecified'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api project(':API')
+}
+
+jar {
+    manifest {
+        attributes(
+                'Implementation-Title': project.name,
+                'Implementation-Version': project.version
+        )
+    }
+}

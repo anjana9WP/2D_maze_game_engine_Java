@@ -1,0 +1,68 @@
+size (10, 17)
+start (9, 3)
+goal (1, 5)
+  obstacle {
+  at (7,7), (5,5), (4,8), (9,2), (4,2), (3,5), (6,8), (9,5), (3,9), (1,9), (9,9), (9,0), (3,0), (2,7), (7,0), (8,1), (6,6), (8,0), (3,8), (5,0), (7,14), (9,5), (2,1), (3,10), (8,3), (4,1)
+  requires "grey vial", "magic turquoise flask"
+}
+
+item "grey vial" {
+  at (8,9)
+  message "uwYHSPVdn"
+}
+
+item "magic turquoise flask" {
+  at (6,2)
+  message "=Jm"
+}
+
+item "map" {
+  at (5,14)
+  message "uwYddVdn"
+}
+
+plugin edu.curtin.assignment2.teleport.Teleport
+plugin edu.curtin.gameplugins.Reveal
+plugin edu.curtin.gameplugins.Penalty.Penalty
+
+item "bejeweled grey book" {
+  at (1,3)
+  message "PtdMSvgBzE"
+}
+
+script !{
+class PluginItemCounter:
+    def __init__(self, api):
+        self.api = api
+        self.items_acquired = 0
+        self.obstacles_traversed = 0
+        self.special_item_added = False
+        self.api.registerMoveCallback(self.on_move)
+        self.api.registerItemCallback(self.on_item_acquired)
+    def on_move(self):
+        player_loc = self.api.getPlayerLocation()
+        content = self.api.getGridSquareContents(player_loc[0], player_loc[1])
+        if content == "Obstacle":
+            self.obstacles_traversed += 1
+            self.check_and_add_special_item()
+    def on_item_acquired(self):
+        self.items_acquired += 1
+        self.check_and_add_special_item()
+    def check_and_add_special_item(self):
+        if not self.special_item_added and (self.items_acquired + self.obstacles_traversed) >= 5:
+            inventory = self.api.getPlayerInventory()
+            inventory.append("PLUGIN ITEM")
+            self.api.appendToSidebar("Special PLUGIN ITEM added to inventory!")
+            self.special_item_added = True
+            # Trigger an update of the game state
+            current_location = self.api.getPlayerLocation()
+            self.api.setPlayerLocation(current_location[0], current_location[1])
+            # Update the UI
+            self.api.updateUI()
+plugin_item_counter = PluginItemCounter(api)
+}
+
+
+
+
+
